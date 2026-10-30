@@ -1,0 +1,28 @@
+name: Build Node 24 iOS 15 CLI carrier
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - launcher.c
+      - entitlements.plist
+      - build.sh
+      - .github/workflows/build.yml
+permissions:
+  contents: read
+jobs:
+  cli:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Link and sign the pinned iOS device runtime
+        run: bash build.sh
+      - name: Upload logs even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: node24-ios15-cli-build
+          path: |
+            node24.22.1-ios15-arm64-cli.tar.gz
+            logs/
+          retention-days: 7
